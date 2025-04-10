@@ -6,6 +6,7 @@ on:
       - "develop"
       - "feat/**"
       - "chore/**"
+      - "feature/**"
 
 jobs:
   docker:
