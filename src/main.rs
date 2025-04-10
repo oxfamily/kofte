@@ -64,6 +64,7 @@ impl FromRef<AppState> for TemplRouterState {
     components(schemas(TemplateType,OpenApiBinaryResponse, FileUpload, Template,UploadFileRequestUriParams, DownloadFileRequestUriParams, Context,TemplateUpsert)),
     paths(
         upload::routes::metadata,
+        upload::routes::find_all_uploads,
         upload::routes::download,
         upload::routes::upload,
         upload::routes::delete_by_id,
@@ -107,7 +108,7 @@ fn get_file_router() -> Router<AppState> {
         .parse::<usize>()
         .unwrap_or_else(|_| panic!("could not extract {}", BODY_SIZE_LIMIT));
     Router::new()
-        .route("/{upl_id}", delete(upload::routes::delete_by_id))
+        .route("/find-all", get(upload::routes::find_all_uploads))
         .route("/download", get(upload::routes::download))
         .route("/metadata", get(upload::routes::metadata))
         .route("/", post(upload::routes::upload))

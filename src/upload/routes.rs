@@ -132,6 +132,39 @@ pub async fn download(
 }
 
 #[utoipa::path(
+    get,
+    path = "/api/v1/upload/find-all",
+    responses(
+        (status = 200, description = "Find all upload", body=Vec<FileUpload>)
+    ),
+    security(("bearerAuth" = []))
+)]
+pub async fn find_all_uploads(
+    State(FileRouterState {
+        client, collection, ..
+    }): State<FileRouterState>,
+    ExtractUserInfo {
+        user_info: x_user_info,
+        ..
+    }: ExtractUserInfo,
+) -> impl IntoResponse {
+    tracing::debug!("Template list route entered!");
+    let repository: StoreRepository<FileUpload> = StoreRepository::get_repository(
+        client,
+        &collection.0,
+        &x_user_info.group.unwrap_or_else(|| PUBLIC_TENANT.into()),
+    )
+    .await;
+    match repository.find_all().await {
+        Ok(templ) => (StatusCode::OK, Json(templ)).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"error": e.to_string()})),
+        )
+            .into_response(),
+    }
+}
+#[utoipa::path(
     delete,
     path = "/api/v1/upload/{id}",
     responses(
